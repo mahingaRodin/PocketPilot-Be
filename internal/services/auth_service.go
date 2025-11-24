@@ -3,8 +3,9 @@ package services
 import (
 	"errors"
 	"pocketpilot-api/internal/models"
-    "pocketpilot-api/internal/repository"
-    "pocketpilot-api/internal/utils"
+	"pocketpilot-api/internal/repository"
+	"pocketpilot-api/internal/utils"
+
 )
 
 type AuthService struct {
@@ -60,4 +61,44 @@ func (s *AuthService) Register(req *models.RegisterRequest) (*models.AuthRespons
         User:  user,
     }, nil
 
+}
+
+
+func (s *AuthService) Login(req *models.LoginRequest) (*models.AuthResponse, error) {
+	user, err := s.userRepo.GetUserByEmail(req.Email)
+
+	if err != nil {
+		return nil,err
+	}
+
+	if user == nil {
+		return nil, errors.New("invalid email or password")
+	}
+
+	if !utils.CheckPasswordHash(req.Password, user.PasswordHash) {
+		return nil , errors.New("invalid password")
+	}
+
+	token, err := utils.GenerateToken(user.ID, user.Email, s.jwtSecret)
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.AuthResponse{
+		Token: token,
+		User: user,
+	}, nil
+}
+
+
+func (s *AuthService) GetUserProfile(userID string) (*models.User, error) {
+    user, err := s.userRepo.GetUserByID(userID)
+    if err != nil {
+        return nil, err
+    }
+    if user == nil {
+        return nil, errors.New("user not found")
+    }
+
+    return user, nil
 }

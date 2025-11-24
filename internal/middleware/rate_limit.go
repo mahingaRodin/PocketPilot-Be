@@ -7,7 +7,7 @@ import (
 )
 
 func RateLimit() gin.HandlerFunc {
-    limiter := rate.NewLimiter(rate.Every(time.Minute), 60) // 60 requests per minute
+    limiter := rate.NewLimiter(rate.Every(time.Minute), 60)
     
     return func(c *gin.Context) {
         if !limiter.Allow() {
@@ -19,4 +19,4 @@ func RateLimit() gin.HandlerFunc {
         }
         c.Next()
     }
-}
+}   
