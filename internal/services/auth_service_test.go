@@ -2,6 +2,7 @@ package services
 
 import (
 	"pocketpilot-api/internal/models"
+	"pocketpilot-api/internal/utils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -101,3 +102,84 @@ func TestAuthService_Register(t *testing.T) {
         mockRepo.AssertExpectations(t)
     })
 }
+
+func TestAuthService_Login(t *testing.T) {
+    mockRepo := new(MockUserRepository)
+    authService := NewAuthService(mockRepo, "test-secret-key")
+
+    loginReq := &models.LoginRequest{
+        Email:    "test@example.com",
+        Password: "password123",
+    }
+
+    t.Run("Successful Login", func(t *testing.T) {
+        // Create a user with hashed password (simulate real hashing)
+        hashedPassword, _ := utils.HashPassword("password123")
+        mockUser := &models.User{
+            ID:           "user-123",
+            Email:        "test@example.com",
+            PasswordHash: hashedPassword,
+            FirstName:    "John",
+            LastName:     "Doe",
+        }
+
+        mockRepo.On("GetUserByEmail", "test@example.com").Return(mockUser, nil)
+
+        authResponse, err := authService.Login(loginReq)
+
+        require.NoError(t, err)
+        require.NotNil(t, authResponse)
+        assert.NotEmpty(t, authResponse.Token)
+        assert.Equal(t, "user-123", authResponse.User.ID)
+        assert.Equal(t, "test@example.com", authResponse.User.Email)
+
+        mockRepo.AssertExpectations(t)
+    })
+
+    t.Run("Login with Non-Existent User", func(t *testing.T) {
+        mockRepo.On("GetUserByEmail", "nonexistent@example.com").Return(nil, nil)
+
+        loginReq.Email = "nonexistent@example.com"
+        authResponse, err := authService.Login(loginReq)
+
+        assert.Error(t, err)
+        assert.Nil(t, authResponse)
+        assert.Equal(t, "invalid email or password", err.Error())
+
+        mockRepo.AssertExpectations(t)
+    })
+
+    t.Run("Login with Wrong Password", func(t *testing.T) {
+        // Create user with different password hash
+        mockUser := &models.User{
+            ID:           "user-123",
+            Email:        "test@example.com",
+            PasswordHash: "different-hash",
+            FirstName:    "John",
+            LastName:     "Doe",
+        }
+
+        mockRepo.On("GetUserByEmail", "test@example.com").Return(mockUser, nil)
+
+        authResponse, err := authService.Login(loginReq)
+
+        assert.Error(t, err)
+        assert.Nil(t, authResponse)
+        assert.Equal(t, "invalid email or password", err.Error())
+
+        mockRepo.AssertExpectations(t)
+    })
+
+    t.Run("Login with Repository Error", func(t *testing.T) {
+        mockRepo.On("GetUserByEmail", "error@example.com").Return(nil, assert.AnError)
+
+        loginReq.Email = "error@example.com"
+        authResponse, err := authService.Login(loginReq)
+
+        assert.Error(t, err)
+        assert.Nil(t, authResponse)
+
+        mockRepo.AssertExpectations(t)
+    })
+}
+
