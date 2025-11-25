@@ -1,21 +1,21 @@
 package repository
 
 import (
-    "database/sql"
-    "errors"
-    "pocketpilot-api/internal/models"
+	"database/sql"
+	"errors"
+	"pocketpilot-api/internal/models"
 )
 
-type UserRepository struct {
+type UserRepositoryImpl struct {
     db *sql.DB
 }
 
-func NewUserRepository(db *sql.DB) *UserRepository {
-    return &UserRepository{db: db}
+
+func NewUserRepository(db *sql.DB) *UserRepositoryImpl {
+    return &UserRepositoryImpl{db: db}
 }
 
-// CreateUser creates a new user in the database
-func (r *UserRepository) CreateUser(user *models.User) error {
+func (r *UserRepositoryImpl) CreateUser(user *models.User) error {
     query := `
         INSERT INTO users (email, password_hash, first_name, last_name)
         VALUES ($1, $2, $3, $4)
@@ -33,8 +33,7 @@ func (r *UserRepository) CreateUser(user *models.User) error {
     return err
 }
 
-// GetUserByEmail finds a user by email
-func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
+func (r *UserRepositoryImpl) GetUserByEmail(email string) (*models.User, error) {
     query := `
         SELECT id, email, password_hash, first_name, last_name, created_at, updated_at
         FROM users 
@@ -62,8 +61,7 @@ func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
     return user, nil
 }
 
-// GetUserByID finds a user by ID
-func (r *UserRepository) GetUserByID(id string) (*models.User, error) {
+func (r *UserRepositoryImpl) GetUserByID(id string) (*models.User, error) {
     query := `
         SELECT id, email, password_hash, first_name, last_name, created_at, updated_at
         FROM users 
@@ -91,8 +89,7 @@ func (r *UserRepository) GetUserByID(id string) (*models.User, error) {
     return user, nil
 }
 
-// EmailExists checks if an email is already registered
-func (r *UserRepository) EmailExists(email string) (bool, error) {
+func (r *UserRepositoryImpl) EmailExists(email string) (bool, error) {
     query := `SELECT COUNT(*) FROM users WHERE email = $1`
     
     var count int

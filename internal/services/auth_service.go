@@ -3,17 +3,16 @@ package services
 import (
 	"errors"
 	"pocketpilot-api/internal/models"
-	"pocketpilot-api/internal/repository"
 	"pocketpilot-api/internal/utils"
 
 )
 
 type AuthService struct {
-	userRepo *repository.UserRepository
+	userRepo UserRepository
 	jwtSecret string
 }
 
-func NewAuthService(userRepo *repository.UserRepository, jwtSecret string) *AuthService {
+func NewAuthService(userRepo UserRepository, jwtSecret string) *AuthService {
 	return &AuthService{
 		userRepo: userRepo,
 		jwtSecret: jwtSecret,
@@ -22,12 +21,12 @@ func NewAuthService(userRepo *repository.UserRepository, jwtSecret string) *Auth
 
 //register new user account
 func (s *AuthService) Register(req *models.RegisterRequest) (*models.AuthResponse, error) {
-	exists, err := s.userRepo.GetUserByEmail(req.Email)
+	exists, err := s.userRepo.EmailExists(req.Email)
 	if err != nil {
 		return nil,err
 	}
 
-	if exists != nil {
+	if exists {
 		return nil, errors.New("email already registered")
 	}
 
