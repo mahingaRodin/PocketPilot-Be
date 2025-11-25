@@ -183,3 +183,49 @@ func TestAuthService_Login(t *testing.T) {
     })
 }
 
+
+func TestAuthService_GetUserProfile(t *testing.T) {
+    mockRepo := new(MockUserRepository)
+    authService := NewAuthService(mockRepo, "test-secret-key")
+
+    t.Run("Successful GetUserProfile", func(t *testing.T) {
+        mockUser := &models.User{
+            ID: "user-123",
+            Email: "test@example.com",
+            FirstName: "Rosine",
+            LastName: "Smith",
+        }
+        mockRepo.On("GetUserByID", "user-123").Return(mockUser, nil)
+        user, err := authService.GetUserProfile("user-123")
+
+        require.NoError(t, err)
+        require.NotNil(t, user)
+        assert.Equal(t, "user-123", user.ID)
+        assert.Equal(t, "test@example.com", user.Email)
+
+        mockRepo.AssertExpectations(t)
+    })
+
+        t.Run("Profile Not Found", func(t *testing.T) {
+        mockRepo.On("GetUserByID", "nonexistent-user").Return(nil, nil)
+
+        user, err := authService.GetUserProfile("nonexistent-user")
+
+        assert.Error(t, err)
+        assert.Nil(t, user)
+        assert.Equal(t, "user not found", err.Error())
+
+        mockRepo.AssertExpectations(t)
+    })
+
+    t.Run("Profile with Repository Error", func(t *testing.T) {
+        mockRepo.On("GetUserByID", "error-user").Return(nil, assert.AnError)
+
+        user, err := authService.GetUserProfile("error-user")
+
+        assert.Error(t, err)
+        assert.Nil(t, user)
+
+        mockRepo.AssertExpectations(t)
+    })
+}
