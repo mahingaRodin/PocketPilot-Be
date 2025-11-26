@@ -1,0 +1,89 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: pocket_pilot_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 12345
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.25'
+
+    - name: Install dependencies
+      run: go mod tidy
+
+    - name: Run tests
+      run: |
+        go test -v ./... -coverprofile=coverage.out
+      env:
+        DATABASE_URL: postgres://postgres:12345@localhost:5432/pocket_pilot_db?sslmode=disable
+        JWT_SECRET: test-jwt-secret-for-ci
+        REDIS_URL: localhost:6379
+        PORT: 8080
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.out
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker image
+      run: |
+        docker build -t pocketpilot-be:latest .
+
+    - name: Test Docker image
+      run: |
+        docker run -d --name test-container -p 8080:8080 \
+          -e DATABASE_URL=postgres://postgres:12345@localhost:5432/pocket_pilot_db \
+          -e JWT_SECRET=test-secret \
+          -e PORT=8080 \
+          pocketpilot-be:latest
+        
+        sleep 10
+        curl -f http://localhost:8080/health || exit 1
+        docker stop test-container
