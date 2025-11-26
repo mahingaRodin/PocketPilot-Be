@@ -78,12 +78,30 @@ jobs:
 
       - name: Test Docker image
         run: |
+          # Create a test database container for the app to connect to
+          docker run -d --name test-db \
+            -e POSTGRES_DB=pocket_pilot_db \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=12345 \
+            -p 5432:5432 \
+            postgres:15-alpine
+          
+          # Wait for database to be ready
+          sleep 15
+          
+          # Start the app container connected to the test database
           docker run -d --name test-container -p 8080:8080 \
-            -e DATABASE_URL=postgres://postgres:12345@localhost:5432/pocket_pilot_db \
+            -e DATABASE_URL=postgres://postgres:12345@host.docker.internal:5432/pocket_pilot_db?sslmode=disable \
             -e JWT_SECRET=test-secret \
             -e PORT=8080 \
             pocketpilot:latest
 
-          sleep 10
+          # Wait for app to start
+          sleep 20
+          
+          # Test health endpoint
           curl -f http://localhost:8080/health || exit 1
-          docker stop test-container
+          
+          # Cleanup
+          docker stop test-container test-db
+          docker rm test-container test-db
