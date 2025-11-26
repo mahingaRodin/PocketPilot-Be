@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: pocketpilot-api
+    name: pocketpilot
     env: go
     buildCommand: |
       go build -o bin/api cmd/api/main.go

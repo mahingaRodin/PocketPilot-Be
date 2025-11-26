@@ -1,5 +1,4 @@
 .env
-internal/config/config.go
 .env.example
 *.sh
 bin/

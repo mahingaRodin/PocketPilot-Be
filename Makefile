@@ -7,7 +7,7 @@ build:
 	go build -o bin/pocketpilot ./cmd/api
 
 docker-build:
-	docker build -t pocketpilot-api:latest .
+	docker build -t pocketpilot:latest .
 
 docker-test:
-	docker run --rm -p 8080:8080 pocketpilot-api:latest
+	docker run --rm -p 8080:8080 pocketpilot:latest

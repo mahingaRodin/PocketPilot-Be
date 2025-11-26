@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"net/http"
-	"pocketpilot-api/internal/models"
-	"pocketpilot-api/internal/services"
-	"pocketpilot-api/internal/utils"
+	"pocketpilot/internal/models"
+	"pocketpilot/internal/services"
+	"pocketpilot/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )

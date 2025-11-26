@@ -1,8 +1,8 @@
 package services
 
 import (
-	"pocketpilot-api/internal/models"
-	"pocketpilot-api/internal/utils"
+	"pocketpilot/internal/models"
+	"pocketpilot/internal/utils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

@@ -74,7 +74,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t pocketpilot-api:latest .
+          docker build -t pocketpilot:latest .
 
       - name: Test Docker image
         run: |
@@ -82,7 +82,7 @@ jobs:
             -e DATABASE_URL=postgres://postgres:12345@localhost:5432/pocket_pilot_db \
             -e JWT_SECRET=test-secret \
             -e PORT=8080 \
-            pocketpilot-api:latest
+            pocketpilot:latest
 
           sleep 10
           curl -f http://localhost:8080/health || exit 1

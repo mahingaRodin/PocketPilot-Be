@@ -2,12 +2,12 @@ package main
 
 import (
 	"log"
-	"pocketpilot-api/internal/config"
-	"pocketpilot-api/internal/handlers"
-	"pocketpilot-api/internal/middleware"
-	"pocketpilot-api/internal/repository"
-	"pocketpilot-api/internal/services"
-	"pocketpilot-api/pkg/database"
+	"pocketpilot/internal/config"
+	"pocketpilot/internal/handlers"
+	"pocketpilot/internal/middleware"
+	"pocketpilot/internal/repository"
+	"pocketpilot/internal/services"
+	"pocketpilot/pkg/database"
 
 	"github.com/gin-gonic/gin"
 )

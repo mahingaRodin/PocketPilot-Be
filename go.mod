@@ -1,4 +1,4 @@
-module pocketpilot-api
+module pocketpilot
 
 go 1.25.2
 

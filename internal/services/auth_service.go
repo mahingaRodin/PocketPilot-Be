@@ -2,9 +2,8 @@ package services
 
 import (
 	"errors"
-	"pocketpilot-api/internal/models"
-	"pocketpilot-api/internal/utils"
-
+	"pocketpilot/internal/models"
+	"pocketpilot/internal/utils"
 )
 
 type AuthService struct {

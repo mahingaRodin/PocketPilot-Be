@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	"pocketpilot-api/internal/models"
+	"pocketpilot/internal/models"
 )
 
 type UserRepositoryImpl struct {

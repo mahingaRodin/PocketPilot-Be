@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"net/http"
-	"pocketpilot-api/internal/utils"
+	"pocketpilot/internal/utils"
 	"strings"
 
 	"github.com/gin-gonic/gin"

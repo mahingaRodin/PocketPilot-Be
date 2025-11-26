@@ -1,6 +1,6 @@
 package services
 
-import "pocketpilot-api/internal/models"
+import "pocketpilot/internal/models"
 
 type UserRepository interface {
     GetUserByEmail(email string) (*models.User, error) 
