@@ -1,6 +1,19 @@
 .env
 internal/config/config.go
-.env.production
-.env.local
-!.env.example
+.env.example
 *.sh
+bin/
+pocketpilot
+
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+*.yml
+
+.env.production.bak
