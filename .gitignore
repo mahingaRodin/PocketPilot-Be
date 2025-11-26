@@ -1,2 +1,6 @@
 .env
 internal/config/config.go
+.env.production
+.env.local
+!.env.example
+*.sh

@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: pocketpilot-api
+    env: go
+    buildCommand: |
+      go build -o bin/api cmd/api/main.go
+      curl -L https://github.com/golang-migrate/migrate/releases/download/v4.16.2/migrate.linux-amd64.tar.gz | tar xvz
+      chmod +x migrate
+    startCommand: |
+      ./migrate -path migrations -database $DATABASE_URL up
+      ./bin/api
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pocketpilot-db
+          property: connectionString
