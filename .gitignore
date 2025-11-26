@@ -14,6 +14,5 @@ pocketpilot
 .idea/
 
 # Docker
-*.yml
 
 .env.production.bak
