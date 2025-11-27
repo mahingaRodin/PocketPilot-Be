@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   app:
@@ -7,15 +7,21 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-    environment:
-      - DATABASE_URL=postgres://postgres:password@db:5432/pocket_pilot_db?sslmode=disable
-      - JWT_SECRET=your-super-secret-jwt-key-for-production
-      - PORT=8080
+    env_file:
+      - .env.production
     depends_on:
       - db
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8080/health",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3

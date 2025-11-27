@@ -11,7 +11,3 @@ pocketpilot
 # IDE
 .vscode/
 .idea/
-
-# Docker
-
-.env.production.bak
