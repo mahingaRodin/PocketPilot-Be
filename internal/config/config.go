@@ -20,7 +20,7 @@ func Load() *Config {
     return &Config{
         DatabaseURL:         getEnv("DATABASE_URL", "postgres://postgres:12345@localhost:5432/pocket_pilot_db?sslmode=disable"),
         JWTSecret:          getEnv("JWT_SECRET", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkV4cGVuc2VUcmFja2VyIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"),
-        Port:               getEnv("PORT", "8080"),
+        Port:               getEnv("PORT", "909"),
         RedisURL:           getEnv("REDIS_URL", "localhost:6379"),
         AWSAccessKeyID:     getEnv("AWS_ACCESS_KEY_ID", ""),
         AWSSecretAccessKey: getEnv("AWS_SECRET_ACCESS_KEY", ""),

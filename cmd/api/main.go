@@ -1,61 +1,75 @@
 package main
 
 import (
-	"log"
-	"pocketpilot/internal/config"
-	"pocketpilot/internal/handlers"
-	"pocketpilot/internal/middleware"
-	"pocketpilot/internal/repository"
-	"pocketpilot/internal/services"
-	"pocketpilot/pkg/database"
+    "log"
+    "pocketpilot/internal/config"
+    "pocketpilot/internal/handlers"
+    "pocketpilot/internal/middleware"
+    "pocketpilot/internal/repository"
+    "pocketpilot/internal/services"
+    "pocketpilot/pkg/database"
 
-	"github.com/gin-gonic/gin"
+    "github.com/gin-gonic/gin"
 )
 
 func main() {
-    // Load configuration
+    // loading config
     cfg := config.Load()
     
-    // Initialize database
+    // db init
     db := database.Connect(cfg.DatabaseURL)
     defer db.Close()
-    
-    // Initialize repositories
+
+    // repo init
     userRepo := repository.NewUserRepository(db.DB)
+    expenseRepo := repository.NewExpenseRepository(db.DB)
     
-    // Initialize services
+    // service init
     authService := services.NewAuthService(userRepo, cfg.JWTSecret)
+    expenseService := services.NewExpenseService(expenseRepo, userRepo)
     
-    // Initialize handlers
+    // handlers init
     authHandler := handlers.NewAuthHandler(authService)
+    expenseHandler := handlers.NewExpenseHandler(expenseService)
     
-    // Initialize Gin router
+    // gin router
     router := gin.Default()
     
-    // Middleware
+    // middleware
     router.Use(middleware.CORS())
     router.Use(middleware.RateLimit())
     
-    // Routes
-    setupRoutes(router, authHandler, cfg.JWTSecret)
+    // routes (NOW passing expenseHandler)
+    setupRoutes(router, authHandler, expenseHandler, cfg.JWTSecret)
     
-    // Start server
+    // start server
     log.Printf("Server starting on port %s", cfg.Port)
     log.Fatal(router.Run(":" + cfg.Port))
 }
 
-func setupRoutes(router *gin.Engine, authHandler *handlers.AuthHandler, jwtSecret string) {
-    // Public routes
+func setupRoutes(router *gin.Engine, authHandler *handlers.AuthHandler, expenseHandler *handlers.ExpenseHandler, jwtSecret string) {
+    // Public auth routes
     router.POST("/api/auth/register", authHandler.Register)
     router.POST("/api/auth/login", authHandler.Login)
-    
-    // Protected routes
+
+    // Protected group
     auth := router.Group("/api")
     auth.Use(middleware.AuthMiddleware(jwtSecret))
+
+    // Auth profile
+    auth.GET("/auth/profile", authHandler.GetProfile)
+
+    // Expense routes
+    expenses := auth.Group("/expenses")
     {
-        auth.GET("/auth/profile", authHandler.GetProfile)
+        expenses.POST("/", expenseHandler.CreateExpense)
+        expenses.GET("/", expenseHandler.GetExpenses)
+        expenses.GET("/:id", expenseHandler.GetExpense)
+        expenses.PUT("/:id", expenseHandler.UpdateExpense)
+        expenses.DELETE("/:id", expenseHandler.DeleteExpense)
+        expenses.GET("/team/:teamId", expenseHandler.GetTeamExpenses)
     }
-    
+
     // Health check
     router.GET("/health", func(c *gin.Context) {
         c.JSON(200, gin.H{
