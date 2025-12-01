@@ -22,15 +22,15 @@ func main() {
 
     // repo init
     userRepo := repository.NewUserRepository(db.DB)
-    expenseRepo := repository.NewExpenseRepository(db.DB)
+    // expenseRepo := repository.NewExpenseRepository(db.DB)
     
     // service init
     authService := services.NewAuthService(userRepo, cfg.JWTSecret)
-    expenseService := services.NewExpenseService(expenseRepo, userRepo)
+    // expenseService := services.NewExpenseService(expenseRepo, userRepo)
     
     // handlers init
     authHandler := handlers.NewAuthHandler(authService)
-    expenseHandler := handlers.NewExpenseHandler(expenseService)
+    // expenseHandler := handlers.NewExpenseHandler(expenseService)
     
     // gin router
     router := gin.Default()
@@ -40,14 +40,14 @@ func main() {
     router.Use(middleware.RateLimit())
     
     // routes (NOW passing expenseHandler)
-    setupRoutes(router, authHandler, expenseHandler, cfg.JWTSecret)
+    setupRoutes(router, authHandler,cfg.JWTSecret)
     
     // start server
     log.Printf("Server starting on port %s", cfg.Port)
     log.Fatal(router.Run(":" + cfg.Port))
 }
 
-func setupRoutes(router *gin.Engine, authHandler *handlers.AuthHandler, expenseHandler *handlers.ExpenseHandler, jwtSecret string) {
+func setupRoutes(router *gin.Engine, authHandler *handlers.AuthHandler,jwtSecret string) {
     // Public auth routes
     router.POST("/api/auth/register", authHandler.Register)
     router.POST("/api/auth/login", authHandler.Login)
@@ -59,16 +59,16 @@ func setupRoutes(router *gin.Engine, authHandler *handlers.AuthHandler, expenseH
     // Auth profile
     auth.GET("/auth/profile", authHandler.GetProfile)
 
-    // Expense routes
-    expenses := auth.Group("/expenses")
-    {
-        expenses.POST("/", expenseHandler.CreateExpense)
-        expenses.GET("/", expenseHandler.GetExpenses)
-        expenses.GET("/:id", expenseHandler.GetExpense)
-        expenses.PUT("/:id", expenseHandler.UpdateExpense)
-        expenses.DELETE("/:id", expenseHandler.DeleteExpense)
-        expenses.GET("/team/:teamId", expenseHandler.GetTeamExpenses)
-    }
+    // // Expense routes
+    // expenses := auth.Group("/expenses")
+    // {
+    //     expenses.POST("/", expenseHandler.CreateExpense)
+    //     expenses.GET("/", expenseHandler.GetExpenses)
+    //     expenses.GET("/:id", expenseHandler.GetExpense)
+    //     expenses.PUT("/:id", expenseHandler.UpdateExpense)
+    //     expenses.DELETE("/:id", expenseHandler.DeleteExpense)
+    //     expenses.GET("/team/:teamId", expenseHandler.GetTeamExpenses)
+    // }
 
     // Health check
     router.GET("/health", func(c *gin.Context) {

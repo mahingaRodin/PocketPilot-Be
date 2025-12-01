@@ -8,11 +8,11 @@ import (
 )
 
 type ExpenseService struct {
-    expenseRepo *repository.ExpenseRepository
+    expenseRepo ExpenseRepository
     userRepo    *repository.UserRepositoryImpl
 }
 
-func NewExpenseService(expenseRepo *repository.ExpenseRepository, userRepo *repository.UserRepositoryImpl) *ExpenseService {
+func NewExpenseService(expenseRepo ExpenseRepository, userRepo *repository.UserRepositoryImpl) *ExpenseService {
     return &ExpenseService{
         expenseRepo: expenseRepo,
         userRepo:    userRepo,

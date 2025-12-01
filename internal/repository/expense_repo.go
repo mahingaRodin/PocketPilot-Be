@@ -8,16 +8,16 @@ import (
     "time"
 )
 
-type ExpenseRepository struct {
+type ExpenseRepositoryImpl struct {
     db *sql.DB
 }
 
-func NewExpenseRepository(db *sql.DB) *ExpenseRepository {
-    return &ExpenseRepository{db: db}
+func NewExpenseRepository(db *sql.DB) *ExpenseRepositoryImpl {
+    return &ExpenseRepositoryImpl{db: db}
 }
 
 // CreateExpense creates a new expense
-func (r *ExpenseRepository) CreateExpense(expense *models.Expense) error {
+func (r *ExpenseRepositoryImpl) CreateExpense(expense *models.Expense) error {
     query := `
         INSERT INTO expenses (user_id, team_id, amount, currency, description, category, expense_date, receipt_image_url, status)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
@@ -41,7 +41,7 @@ func (r *ExpenseRepository) CreateExpense(expense *models.Expense) error {
 }
 
 // GetExpenseByID retrieves an expense by ID
-func (r *ExpenseRepository) GetExpenseByID(id string) (*models.Expense, error) {
+func (r *ExpenseRepositoryImpl) GetExpenseByID(id string) (*models.Expense, error) {
     query := `
         SELECT id, user_id, team_id, amount, currency, description, category, 
                expense_date, receipt_image_url, status, created_at, updated_at
@@ -76,7 +76,7 @@ func (r *ExpenseRepository) GetExpenseByID(id string) (*models.Expense, error) {
 }
 
 // GetExpensesByUser retrieves all expenses for a user
-func (r *ExpenseRepository) GetExpensesByUser(userID string, limit, offset int) ([]*models.Expense, error) {
+func (r *ExpenseRepositoryImpl) GetExpensesByUser(userID string, limit, offset int) ([]*models.Expense, error) {
     query := `
         SELECT id, user_id, team_id, amount, currency, description, category, 
                expense_date, receipt_image_url, status, created_at, updated_at
@@ -119,7 +119,7 @@ func (r *ExpenseRepository) GetExpensesByUser(userID string, limit, offset int) 
 }
 
 // UpdateExpense updates an existing expense
-func (r *ExpenseRepository) UpdateExpense(expense *models.Expense) error {
+func (r *ExpenseRepositoryImpl) UpdateExpense(expense *models.Expense) error {
     query := `
         UPDATE expenses 
         SET amount = $1, currency = $2, description = $3, category = $4, 
@@ -147,7 +147,7 @@ func (r *ExpenseRepository) UpdateExpense(expense *models.Expense) error {
 }
 
 // DeleteExpense deletes an expense
-func (r *ExpenseRepository) DeleteExpense(id, userID string) error {
+func (r *ExpenseRepositoryImpl) DeleteExpense(id, userID string) error {
     query := `DELETE FROM expenses WHERE id = $1 AND user_id = $2`
     result, err := r.db.Exec(query, id, userID)
     if err != nil {
@@ -167,7 +167,7 @@ func (r *ExpenseRepository) DeleteExpense(id, userID string) error {
 }
 
 // GetExpensesByTeam retrieves expenses for a team
-func (r *ExpenseRepository) GetExpensesByTeam(teamID string, limit, offset int) ([]*models.Expense, error) {
+func (r *ExpenseRepositoryImpl) GetExpensesByTeam(teamID string, limit, offset int) ([]*models.Expense, error) {
     query := `
         SELECT id, user_id, team_id, amount, currency, description, category, 
                expense_date, receipt_image_url, status, created_at, updated_at
