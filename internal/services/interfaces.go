@@ -8,3 +8,13 @@ type UserRepository interface {
 	GetUserByID(id string) (*models.User, error)
 	EmailExists(email string) (bool, error)
 }
+
+type ExpenseRepository interface {
+    CreateExpense(*models.Expense) error
+    GetExpenseByID(string) (*models.Expense, error)
+    GetExpensesByID(string) (*models.Expense, error)
+    GetExpensesByUser(string, int, int) ([]*models.Expense, error)
+    UpdateExpense(*models.Expense) error
+    DeleteExpense(string, string) error
+    GetExpensesByTeam(string, int, int) ([]*models.Expense, error)
+}

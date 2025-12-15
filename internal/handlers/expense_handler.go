@@ -17,7 +17,16 @@ func NewExpenseHandler(expenseService *services.ExpenseService) *ExpenseHandler 
     return &ExpenseHandler{expenseService: expenseService}
 }
 
-// CreateExpense handles expense creation
+// @Summary Create expense
+// @Description Create a new expense
+// @Tags Expenses
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param expense body models.CreateExpenseRequest true "Expense payload"
+// @Success 201 {object} models.Expense
+// @Failure 400 {object} models.ErrorResponse
+// @Router /api/expenses [post]
 func (h *ExpenseHandler) CreateExpense(c *gin.Context) {
     userID, exists := c.Get("userID")
     if !exists {
@@ -40,7 +49,13 @@ func (h *ExpenseHandler) CreateExpense(c *gin.Context) {
     c.JSON(http.StatusCreated, utils.SuccessResponse("Expense created successfully", expense))
 }
 
-// GetExpenses retrieves user's expenses
+// @Summary Get expenses
+// @Description Retrieve user's expenses
+// @Tags Expenses
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} models.Expense
+// @Router /api/expenses [get]
 func (h *ExpenseHandler) GetExpenses(c *gin.Context) {
     userID, exists := c.Get("userID")
     if !exists {
@@ -60,7 +75,15 @@ func (h *ExpenseHandler) GetExpenses(c *gin.Context) {
     c.JSON(http.StatusOK, utils.SuccessResponse("Expenses retrieved successfully", expenses))
 }
 
-// GetExpense retrieves a specific expense
+// @Summary Get expense
+// @Description Retrieve a specific expense by ID
+// @Tags Expenses
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Expense ID"
+// @Success 200 {object} models.Expense
+// @Failure 404 {object} models.ErrorResponse
+// @Router /api/expenses/{id} [get]
 func (h *ExpenseHandler) GetExpense(c *gin.Context) {
     userID, exists := c.Get("userID")
     if !exists {
@@ -78,7 +101,17 @@ func (h *ExpenseHandler) GetExpense(c *gin.Context) {
     c.JSON(http.StatusOK, utils.SuccessResponse("Expense retrieved successfully", expense))
 }
 
-// UpdateExpense updates an expense
+// @Summary Update expense
+// @Description Update an existing expense
+// @Tags Expenses
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Expense ID"
+// @Param expense body models.UpdateExpenseRequest true "Expense payload"
+// @Success 200 {object} models.Expense
+// @Failure 400 {object} models.ErrorResponse
+// @Router /api/expenses/{id} [put]
 func (h *ExpenseHandler) UpdateExpense(c *gin.Context) {
     userID, exists := c.Get("userID")
     if !exists {
@@ -102,7 +135,15 @@ func (h *ExpenseHandler) UpdateExpense(c *gin.Context) {
     c.JSON(http.StatusOK, utils.SuccessResponse("Expense updated successfully", expense))
 }
 
-// DeleteExpense deletes an expense
+// @Summary Delete expense
+// @Description Delete an expense
+// @Tags Expenses
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Expense ID"
+// @Success 204
+// @Failure 404 {object} models.ErrorResponse
+// @Router /api/expenses/{id} [delete]
 func (h *ExpenseHandler) DeleteExpense(c *gin.Context) {
     userID, exists := c.Get("userID")
     if !exists {
@@ -120,7 +161,14 @@ func (h *ExpenseHandler) DeleteExpense(c *gin.Context) {
     c.JSON(http.StatusOK, utils.SuccessResponse("Expense deleted successfully", nil))
 }
 
-// GetTeamExpenses retrieves team expenses
+// @Summary Get team expenses
+// @Description Retrieve expenses for a team
+// @Tags Expenses
+// @Produce json
+// @Security BearerAuth
+// @Param teamId path string true "Team ID"
+// @Success 200 {array} models.Expense
+// @Router /api/expenses/team/{teamId} [get]
 func (h *ExpenseHandler) GetTeamExpenses(c *gin.Context) {
     userID, exists := c.Get("userID")
     if !exists {
