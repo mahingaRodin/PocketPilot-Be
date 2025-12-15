@@ -1,3 +1,21 @@
+// @title           PocketPilot API
+// @version         1.0
+// @description     Backend API for PocketPilot expense tracking app.
+
+// @contact.name    pocketpilot
+// @contact.email   mahingarodin@gmail.com
+
+// @license.name    MIT
+// @license.url     https://opensource.org/licenses/MIT
+
+// @host            localhost:909
+// @BasePath        /api
+
+// @schemes         http https
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+
 package main
 
 import (
@@ -10,6 +28,11 @@ import (
     "pocketpilot/pkg/database"
 
     "github.com/gin-gonic/gin"
+
+    _ "pocketpilot/docs" // <-- IMPORTANT: Side-effect import for generated Swagger docs (replace 'pocketpilot' with your module name from go.mod)
+
+    ginSwagger "github.com/swaggo/gin-swagger"
+    "github.com/swaggo/files"
 )
 
 func main() {
@@ -38,16 +61,19 @@ func main() {
     // middleware
     router.Use(middleware.CORS())
     router.Use(middleware.RateLimit())
+
+    // Add Swagger UI endpoint (before routes for easy access)
+    router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
     
     // routes (NOW passing expenseHandler)
-    setupRoutes(router, authHandler,cfg.JWTSecret)
+    setupRoutes(router, authHandler, cfg.JWTSecret)
     
     // start server
     log.Printf("Server starting on port %s", cfg.Port)
     log.Fatal(router.Run(":" + cfg.Port))
 }
 
-func setupRoutes(router *gin.Engine, authHandler *handlers.AuthHandler,jwtSecret string) {
+func setupRoutes(router *gin.Engine, authHandler *handlers.AuthHandler, jwtSecret string) {
     // Public auth routes
     router.POST("/api/auth/register", authHandler.Register)
     router.POST("/api/auth/login", authHandler.Login)
